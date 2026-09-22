@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Minha conta: {{ cfg.nome }}{% endblock %}
+{% block conteudo %}
+<main class="conteudo estreito">
+  <h1 class="titulo-pagina">Minha conta</h1>
+  <div class="cartao">
+    <p><b>{{ usuario.nome }}</b><br><span class="nota-inline">{{ usuario.email }}</span></p>
+    {% if usuario.admin %}
+      <p>Administrador: acesso sem vencimento.</p>
+    {% else %}
+      <p>Acesso {{ "liberado" if ativo else "vencido" }} até <b>{{ usuario.ativo_ate[8:10] }}/{{ usuario.ativo_ate[5:7] }}/{{ usuario.ativo_ate[:4] }}</b>.
+      {% if cfg.suporte_whatsapp %}<a href="https://wa.me/{{ cfg.suporte_whatsapp }}?text={{ ('Quero renovar o ' ~ cfg.nome ~ ' (' ~ usuario.email ~ ')')|urlencode }}" target="_blank" rel="noopener">Renovar</a>{% endif %}</p>
+    {% endif %}
+    <p>Contas do Instagram: {{ contas|length }} de {{ usuario.max_contas }}. <a href="{{ url_for('conectar') }}">Gerenciar</a></p>
+  </div>
+  <form class="cartao form-coluna" method="post">
+    <h2>Trocar senha</h2>
+    <input class="campo" type="password" name="atual" placeholder="Senha atual" required autocomplete="current-password">
+    <input class="campo" type="password" name="nova" placeholder="Nova senha (mín. 8)" minlength="8" required autocomplete="new-password">
+    {% if erro %}<p class="erro-login">{{ erro }}</p>{% endif %}
+    {% if msg %}<p class="ok-msg">{{ msg }}</p>{% endif %}
+    <button class="botao" type="submit">Salvar</button>
+  </form>
+</main>
+{% endblock %}

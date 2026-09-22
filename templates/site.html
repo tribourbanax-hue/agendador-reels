@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block meta %}<meta name="description" content="Agende Reels e Stories do Instagram em lote: suba vários vídeos, distribua as datas em segundos e deixe publicar sozinho.">{% endblock %}
+{% block titulo %}{{ cfg.nome }}: agende Reels e Stories em lote{% endblock %}
+{% block corpo_classe %}pagina-site{% endblock %}
+{% block topo %}
+<header class="topo topo-site">
+  <a class="marca" href="/"><span class="marca-ponto" aria-hidden="true"></span><span class="marca-nome">{{ cfg.nome }}</span></a>
+  <nav class="menu-conta">
+    {% if usuario %}
+      <a class="botao botao-pequeno" href="{{ url_for('painel') }}">Ir para o painel</a>
+    {% else %}
+      <a class="link-discreto" href="{{ url_for('entrar') }}">Entrar</a>
+      <a class="botao botao-pequeno" href="{{ url_for('cadastro') }}">Testar grátis</a>
+    {% endif %}
+  </nav>
+</header>
+{% endblock %}
+
+{% block conteudo %}
+<main>
+  <section class="hero">
+    <div class="hero-texto">
+      <p class="selo-hero">Reels + Stories · Instagram oficial</p>
+      <h1>Um mês de Reels e Stories agendado em 10 minutos.</h1>
+      <p class="lead">Arraste todos os vídeos de uma vez, escolha Reels, Stories ou os dois, distribua as datas com um clique e pronto. O {{ cfg.nome }} publica na hora certa, mesmo com o seu computador desligado.</p>
+      <div class="hero-cta">
+        <a class="botao" href="{{ url_for('cadastro') }}">Testar {{ cfg.teste_dias }} dias grátis</a>
+        <a class="link-discreto" href="#como-funciona">Ver como funciona ↓</a>
+      </div>
+      <p class="nota-hero">Sem cartão no teste. Publica pela API oficial da Meta, sem pedir a senha do seu Instagram.</p>
+    </div>
+    <div class="hero-demo" aria-hidden="true">
+      <div class="demo-cartao"><span class="demo-mini m1"></span><div><b>Lançamento_01.mp4</b><small>Reels + Story · seg 09:00</small></div><i class="pill pill-AGENDADO">agendado</i></div>
+      <div class="demo-cartao"><span class="demo-mini m2"></span><div><b>Antes_depois.mp4</b><small>Reels · ter 09:00</small></div><i class="pill pill-AGENDADO">agendado</i></div>
+      <div class="demo-cartao"><span class="demo-mini m3"></span><div><b>Bastidores.mp4</b><small>Story · qua 12:00</small></div><i class="pill pill-AGENDADO">agendado</i></div>
+      <div class="demo-cartao"><span class="demo-mini m4"></span><div><b>Promo_sabado.mp4</b><small>Reels · sex 18:30</small></div><i class="pill pill-PUBLICADO">publicado</i></div>
+    </div>
+  </section>
+
+  <section class="faixa-dores">
+    <div><b>Chega de postar um por um</b><span>O Business Suite obriga a subir e agendar vídeo por vídeo.</span></div>
+    <div><b>Stories agendados de verdade</b><span>Story programado também sai sozinho, sem você abrir o celular.</span></div>
+    <div><b>Legenda em massa</b><span>Uma legenda para todos, e você ajusta só o que precisar.</span></div>
+  </section>
+
+  <section class="secao" id="como-funciona">
+    <h2>Como funciona</h2>
+    <ol class="passos-site">
+      <li><b>Conecte seu Instagram</b><span>Um assistente passo a passo liga a sua conta profissional pela API oficial. É feito uma vez só, sem precisar renovar.</span></li>
+      <li><b>Arraste os vídeos</b><span>Do computador ou do celular, quantos quiser. Escolha Reels, Stories ou os dois para cada um.</span></li>
+      <li><b>Distribua as datas</b><span>"1 por dia às 9h, pulando domingo." Um clique e o mês inteiro fica montado. Dá para ajustar um por um.</span></li>
+      <li><b>Pronto</b><span>Acompanhe tudo na fila: agendado, publicado, com erro. Dá para editar, cancelar ou publicar na hora.</span></li>
+    </ol>
+  </section>
+
+  <section class="secao secao-clara">
+    <h2>Feito para quem posta todo dia</h2>
+    <div class="grade-beneficios">
+      <div><b>Lojas e comércios</b><span>Grave os vídeos da semana no domingo e esqueça o Instagram até a próxima.</span></div>
+      <div><b>Social media e agências</b><span>Várias contas de clientes num painel só. Monte o calendário do mês de cada um em minutos.</span></div>
+      <div><b>Criadores de conteúdo</b><span>Mantenha a frequência que o algoritmo gosta sem ficar preso ao celular no horário de pico.</span></div>
+    </div>
+  </section>
+
+  <section class="secao" id="preco">
+    <h2>Preço simples</h2>
+    <div class="cartao-preco">
+      <p class="preco">{{ cfg.preco }}</p>
+      <ul>
+        <li>Reels e Stories ilimitados (dentro do limite do próprio Instagram)</li>
+        <li>Agendamento em lote e legenda em massa</li>
+        <li>Publica mesmo com o computador desligado</li>
+        <li>Suporte pelo WhatsApp para conectar a conta</li>
+      </ul>
+      <a class="botao" href="{{ url_for('cadastro') }}">Começar teste grátis de {{ cfg.teste_dias }} dias</a>
+      <p class="nota">Precisa de mais contas (agência)? {% if cfg.suporte_whatsapp %}<a href="https://wa.me/{{ cfg.suporte_whatsapp }}" target="_blank" rel="noopener">Fale com a gente</a>{% else %}Fale com a gente{% endif %}.</p>
+    </div>
+  </section>
+
+  <section class="secao secao-clara">
+    <h2>Perguntas frequentes</h2>
+    <details class="faq"><summary>Preciso passar a senha do meu Instagram?</summary><p>Não. A conexão usa a API oficial da Meta (dona do Instagram), com um acesso que você mesmo gera e pode cancelar quando quiser. Nunca pedimos a sua senha.</p></details>
+    <details class="faq"><summary>Minha conta corre risco de bloqueio?</summary><p>A publicação é feita pela API oficial da Meta, o mesmo caminho usado por ferramentas grandes de agendamento. Não usamos robô que finge ser você no aplicativo.</p></details>
+    <details class="faq"><summary>Que tipo de conta do Instagram funciona?</summary><p>Conta profissional (Empresa ou Criador de conteúdo) ligada a uma Página do Facebook. Se a sua ainda é pessoal, a troca é gratuita e leva 1 minuto no próprio Instagram.</p></details>
+    <details class="faq"><summary>A conexão é difícil?</summary><p>Leva uns 10 minutos, uma vez só. O painel mostra cada clique, e se travar o suporte ajuda pelo WhatsApp.</p></details>
+    <details class="faq"><summary>Posso agendar fotos e carrossel?</summary><p>Por enquanto, vídeos (Reels e Stories). Fotos e carrossel estão no plano de evolução.</p></details>
+    <details class="faq"><summary>E se eu cancelar?</summary><p>Os posts já publicados continuam no seu Instagram. Os agendados param de sair, e você pode remover a conexão a qualquer momento.</p></details>
+  </section>
+
+  <section class="cta-final">
+    <h2>Seu próximo mês de conteúdo, agendado hoje.</h2>
+    <a class="botao" href="{{ url_for('cadastro') }}">Testar grátis</a>
+  </section>
+</main>
+{% endblock %}

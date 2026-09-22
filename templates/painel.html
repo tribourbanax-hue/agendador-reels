@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block titulo %}Painel: {{ cfg.nome }}{% endblock %}
+{% block nav %}
+<nav class="abas" role="tablist">
+  <button class="aba ativa" data-aba="novo" type="button">Novo lote</button>
+  <button class="aba" data-aba="fila" type="button">Fila <span class="contador" id="contador-fila"></span></button>
+</nav>
+{% endblock %}
+{% block conteudo %}
+<main class="conteudo">
+
+  <div class="seletor-conta">
+    <span class="nota-inline">Publicando em</span>
+    <select class="campo" id="conta">
+      {% for c in contas %}<option value="{{ c.id }}" data-status="{{ c.status }}">@{{ c.username }}{{ " (desconectada)" if c.status != "ok" else "" }}</option>{% endfor %}
+    </select>
+    <a class="link-discreto" href="{{ url_for('conectar') }}">+ conta</a>
+  </div>
+  <p class="faixa-alerta-inline" id="aviso-conta" hidden>Esta conta está desconectada. <a href="{{ url_for('conectar') }}">Reconectar</a> antes de agendar.</p>
+
+  <!-- ===================== NOVO LOTE ===================== -->
+  <section id="aba-novo" class="painel-aba">
+    <div class="passo">
+      <h2><span class="num">1</span> O que vamos postar?</h2>
+      <div class="escolha-tipo" id="escolha-tipo">
+        <button type="button" data-tipo="reels"><b>Reels</b><small>fica no perfil, com legenda</small></button>
+        <button type="button" data-tipo="story"><b>Stories</b><small>some em 24h, sem legenda</small></button>
+        <button type="button" data-tipo="ambos"><b>Reels + Story</b><small>cada vídeo sai nos dois</small></button>
+      </div>
+    </div>
+
+    <div class="passo" id="passo-videos" hidden>
+      <h2><span class="num">2</span> Escolha os vídeos</h2>
+      <label class="zona-soltar" id="zona-soltar">
+        <input type="file" id="input-arquivos" accept="video/mp4,video/quicktime,.mp4,.mov,.m4v" multiple hidden>
+        <b>Arraste os vídeos aqui</b>
+        <span>ou toque para escolher do computador/celular (vários de uma vez) · MP4 ou MOV, vertical 9:16</span>
+      </label>
+    </div>
+
+    <div class="passo" id="passo-lote" hidden>
+      <h2><span class="num">3</span> Ajuste e agende <span class="sub-h" id="resumo-lote"></span></h2>
+      <details class="ferramentas" open>
+        <summary>Ferramentas em massa</summary>
+        <div class="ferr-grade">
+          <div class="ferr">
+            <h3>Distribuir datas</h3>
+            <div class="linha-campos">
+              <label>Começa em<input class="campo" type="date" id="m-inicio"></label>
+              <label>Horário<input class="campo" type="time" id="m-hora" value="09:00"></label>
+            </div>
+            <label>Ritmo
+              <select class="campo" id="m-ritmo">
+                <option value="dia">1 por dia</option>
+                <option value="dias2">1 a cada 2 dias</option>
+                <option value="horas">Vários no mesmo dia, a cada X horas</option>
+                <option value="mesmo">Todos no mesmo horário</option>
+              </select>
+            </label>
+            <label id="m-intervalo-grupo" hidden>A cada quantas horas
+              <input class="campo" type="number" id="m-intervalo" min="1" max="12" value="3">
+            </label>
+            <label class="check"><input type="checkbox" id="m-pular-domingo"> pular domingos</label>
+            <button class="botao-secundario" type="button" id="m-aplicar-datas">Aplicar na ordem da lista</button>
+          </div>
+          <div class="ferr">
+            <h3>Legenda para os Reels</h3>
+            <textarea class="campo" id="m-legenda" rows="4" placeholder="Texto que vai em todos os Reels (dá para ajustar um por um depois)"></textarea>
+            <div class="linha-botoes">
+              <button class="botao-secundario" type="button" id="m-legenda-vazias">Só nos vazios</button>
+              <button class="botao-secundario" type="button" id="m-legenda-todas">Em todos</button>
+            </div>
+            <h3 style="margin-top:14px">Tipo para todos</h3>
+            <div class="linha-botoes">
+              <button class="botao-secundario" type="button" data-tipo-todos="reels">Reels</button>
+              <button class="botao-secundario" type="button" data-tipo-todos="story">Story</button>
+              <button class="botao-secundario" type="button" data-tipo-todos="ambos">Os dois</button>
+            </div>
+          </div>
+        </div>
+      </details>
+      <div id="lista-lote" class="lista-lote"></div>
+    </div>
+  </section>
+
+  <!-- ===================== FILA ===================== -->
+  <section id="aba-fila" class="painel-aba" hidden>
+    <div class="fila-topo">
+      <div class="seg">
+        <button type="button" class="ativo" data-ver="proximos">Próximos</button>
+        <button type="button" data-ver="historico">Já publicados</button>
+      </div>
+      <button class="link-discreto" type="button" id="atualizar-fila">atualizar</button>
+    </div>
+    <div id="lista-fila"></div>
+  </section>
+</main>
+
+<div class="barra-agendar" id="barra-agendar" hidden>
+  <span id="barra-status"></span>
+  <button class="botao" type="button" id="btn-agendar">Agendar</button>
+</div>
+<div class="aviso-flutuante" id="toast" hidden></div>
+{% endblock %}
+{% block rodape %}{% endblock %}
+{% block scripts %}<script src="/static/painel.js?v=3"></script>{% endblock %}

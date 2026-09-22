@@ -1,0 +1,13 @@
+[Unit]
+Description=Agendador de Reels (tela web)
+After=network.target
+
+[Service]
+User=agendador
+WorkingDirectory=/opt/agendador
+ExecStart=/opt/agendador/venv/bin/gunicorn -w 1 --threads 8 -b 127.0.0.1:5070 --timeout 900 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

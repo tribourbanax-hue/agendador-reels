@@ -1,0 +1,14 @@
+[Unit]
+Description=Agendador de Reels (publica na hora marcada)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=agendador
+WorkingDirectory=/opt/agendador
+ExecStart=/opt/agendador/venv/bin/python worker.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

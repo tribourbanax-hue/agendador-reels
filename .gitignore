@@ -1,0 +1,4 @@
+.env
+dados/
+logs/
+__pycache__/

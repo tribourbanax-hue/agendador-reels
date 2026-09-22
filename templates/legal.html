@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}{{ "Termos de uso" if pagina == "termos" else "Política de privacidade" }}: {{ cfg.nome }}{% endblock %}
+{% block conteudo %}
+<main class="conteudo texto-legal">
+  <p class="aviso-rascunho">MODELO: revise com um advogado e troque os campos entre [colchetes] antes de vender.</p>
+  {% if pagina == "termos" %}
+  <h1>Termos de uso</h1>
+  <p>Última atualização: [DATA]</p>
+  <h2>1. O serviço</h2>
+  <p>O {{ cfg.nome }}, oferecido por {{ cfg.empresa }}, permite agendar a publicação de vídeos (Reels e Stories) em contas profissionais do Instagram conectadas pelo próprio usuário por meio da API oficial da Meta Platforms.</p>
+  <h2>2. Conta e acesso</h2>
+  <p>Você é responsável pelos dados de acesso da sua conta e por todo conteúdo agendado por ela. O acesso vale pelo período contratado ou de teste e pode ser suspenso por falta de pagamento ou por uso que viole estes termos ou as regras do Instagram.</p>
+  <h2>3. Conteúdo</h2>
+  <p>Você declara ter os direitos sobre os vídeos, músicas e textos que publica. Não é permitido usar o serviço para spam, conteúdo ilegal ou que viole as <a href="https://help.instagram.com/581066165581870" target="_blank" rel="noopener">Diretrizes da Comunidade do Instagram</a>.</p>
+  <h2>4. Limitações</h2>
+  <p>A publicação depende da disponibilidade da API da Meta, que pode recusar, atrasar ou alterar regras sem aviso. Não garantimos resultados de alcance ou engajamento. Em caso de falha, o post aparece como erro no painel para você reagendar.</p>
+  <h2>5. Pagamento e cancelamento</h2>
+  <p>[Descrever valor, forma de pagamento, renovação, política de reembolso e cancelamento.]</p>
+  <h2>6. Contato</h2>
+  <p>[E-mail / WhatsApp de suporte]. Foro: [cidade/UF].</p>
+  {% else %}
+  <h1>Política de privacidade</h1>
+  <p>Última atualização: [DATA]</p>
+  <h2>Quem somos</h2>
+  <p>{{ cfg.empresa }}, responsável pelo {{ cfg.nome }}. Contato do encarregado (LGPD): [E-MAIL].</p>
+  <h2>Dados que coletamos</h2>
+  <ul>
+    <li><b>Cadastro:</b> nome, e-mail, WhatsApp e senha (guardada só em forma criptografada irreversível).</li>
+    <li><b>Conexão com o Instagram:</b> identificador da conta, nome de usuário, Página do Facebook ligada e o token de acesso da Página, guardado criptografado. Não recebemos a sua senha do Facebook nem do Instagram.</li>
+    <li><b>Conteúdo:</b> os vídeos e legendas que você agenda. Os vídeos são apagados do servidor automaticamente alguns dias depois de publicados.</li>
+  </ul>
+  <h2>Para que usamos</h2>
+  <p>Somente para publicar o conteúdo que você agendou, na conta que você escolheu, e para dar suporte. Não vendemos nem compartilhamos seus dados com terceiros, exceto a própria Meta, que recebe o conteúdo no momento da publicação.</p>
+  <h2>Seus direitos</h2>
+  <p>Você pode remover a conexão com o Instagram a qualquer momento em "Contas" (o token é apagado na hora), e pedir a exclusão completa da sua conta e dados pelo contato acima. Também pode revogar o acesso direto no Facebook, em Configurações &gt; Integrações comerciais.</p>
+  <h2>Segurança</h2>
+  <p>Conexões por HTTPS, tokens criptografados e acesso ao servidor restrito.</p>
+  {% endif %}
+</main>
+{% endblock %}

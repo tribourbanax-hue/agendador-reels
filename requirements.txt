@@ -1,0 +1,6 @@
+flask>=3.0
+requests
+python-dotenv
+cryptography
+tzdata
+gunicorn; sys_platform != "win32"

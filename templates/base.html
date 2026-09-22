@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  {% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+  <title>{% block titulo %}{{ cfg.nome }}{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23c2522c'/%3E%3Cpath d='M10 8h12v3H10zM9 14h14v10H9z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/app.css?v=3">
+  <link rel="stylesheet" href="/static/produto.css?v=4">
+</head>
+<body class="{% block corpo_classe %}{% endblock %}">
+{% block topo %}
+<header class="topo">
+  <a class="marca" href="{{ url_for('painel') if usuario else url_for('inicio') }}">
+    <span class="marca-ponto" aria-hidden="true"></span>
+    <span class="marca-nome">{{ cfg.nome }}</span>
+  </a>
+  {% block nav %}{% endblock %}
+  {% if usuario %}
+  <nav class="menu-conta">
+    {% if usuario.admin %}<a class="link-discreto" href="{{ url_for('admin') }}">admin</a>{% endif %}
+    <a class="link-discreto" href="{{ url_for('conectar') }}">contas</a>
+    <a class="link-discreto" href="{{ url_for('minha_conta') }}">minha conta</a>
+    <a class="link-discreto" href="{{ url_for('sair') }}">sair</a>
+  </nav>
+  {% endif %}
+</header>
+{% if usuario and not ativo %}
+<div class="faixa-alerta">Seu acesso venceu em {{ usuario.ativo_ate[8:10] }}/{{ usuario.ativo_ate[5:7] }}. Os posts agendados estão pausados.
+  {% if cfg.suporte_whatsapp %}<a href="https://wa.me/{{ cfg.suporte_whatsapp }}?text={{ ('Quero renovar o ' ~ cfg.nome ~ ' (' ~ usuario.email ~ ')')|urlencode }}" target="_blank" rel="noopener">Renovar pelo WhatsApp</a>{% endif %}
+</div>
+{% endif %}
+{% if usuario and cfg.modo_teste %}
+<div class="faixa-teste">MODO TESTE: os vídeos são enviados e processados, mas <b>nada é publicado</b>.</div>
+{% endif %}
+{% endblock %}
+
+{% block conteudo %}{% endblock %}
+
+{% block rodape %}
+<footer class="rodape">
+  <a href="{{ url_for('termos') }}">Termos de uso</a> · <a href="{{ url_for('privacidade') }}">Privacidade</a>
+  {% if cfg.suporte_whatsapp %} · <a href="https://wa.me/{{ cfg.suporte_whatsapp }}" target="_blank" rel="noopener">Suporte</a>{% endif %}
+</footer>
+{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block titulo %}Conectar Instagram: {{ cfg.nome }}{% endblock %}
+{% block conteudo %}
+<main class="conteudo">
+  {% if contas %}
+  <section class="cartao">
+    <div class="linha-titulo">
+      <h2>Contas conectadas <span class="nota-inline">{{ contas|length }} de {{ usuario.max_contas }}</span></h2>
+      <a class="botao botao-pequeno" href="{{ url_for('painel') }}">Ir para o painel →</a>
+    </div>
+    <div class="lista-contas">
+      {% for c in contas %}
+      <div class="conta-linha" data-id="{{ c.id }}">
+        {% if c.foto_url %}<img src="{{ c.foto_url }}" alt="" referrerpolicy="no-referrer">{% else %}<span class="avatar-vazio"></span>{% endif %}
+        <div><b>@{{ c.username }}</b><small>Página: {{ c.page_nome }}</small>
+          {% if c.status != 'ok' %}<small class="msg-erro">Desconectada: refaça o passo 5 abaixo para reconectar.</small>{% endif %}</div>
+        <span class="pill {{ 'pill-PUBLICADO' if c.status == 'ok' else 'pill-ERRO' }}">{{ "conectada" if c.status == 'ok' else "desconectada" }}</span>
+        <button class="link-discreto perigo" type="button" data-remover="{{ c.id }}">remover</button>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <h1 class="titulo-pagina">{{ "Conectar outra conta" if contas else "Conecte seu Instagram" }}</h1>
+  <p class="lead-pagina">É feito uma vez só e leva uns 10 minutos. Você cria um "app" gratuito na Meta, que é a chave oficial que autoriza o {{ cfg.nome }} a publicar na <b>sua</b> conta. Siga os passos na ordem.
+    {% if cfg.suporte_whatsapp %}Travou? <a href="https://wa.me/{{ cfg.suporte_whatsapp }}?text={{ ('Preciso de ajuda para conectar o Instagram no ' ~ cfg.nome)|urlencode }}" target="_blank" rel="noopener">Chame o suporte no WhatsApp</a>.{% endif %}</p>
+
+  <div class="assistente">
+    <ol class="passos-assistente">
+      <li>
+        <details open>
+          <summary><b>Confira sua conta do Instagram</b></summary>
+          <ul>
+            <li>No app do Instagram: <i>Configurações › Tipo de conta e ferramentas</i>. Ela precisa ser <b>Profissional</b> (Empresa ou Criador). Se for pessoal, troque ali mesmo, é grátis.</li>
+            <li>Ela precisa estar <b>ligada a uma Página do Facebook</b> que você administra (<i>Editar perfil › Página</i>).</li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary><b>Crie o app na Meta</b></summary>
+          <ul>
+            <li>Abra <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> e entre com o <b>mesmo Facebook que administra a Página</b>. Se for a primeira vez, ele pede para confirmar a conta de desenvolvedor (grátis).</li>
+            <li>Clique em <b>Criar app</b>. Nome: qualquer um, ex: "Agendador Minha Loja".</li>
+            <li>Em <i>Caso de uso</i>, escolha <b>Outro</b>; em <i>Tipo de app</i>, escolha <b>Empresa</b>. Crie.</li>
+            <li class="alerta-passo">⚠ <b>Não</b> escolha "Gerenciar mensagens e conteúdo no Instagram / login do Instagram". Esse é outro produto e não funciona aqui.</li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary><b>Copie o App ID e a Chave Secreta</b></summary>
+          <ul>
+            <li>No painel do app: <i>Configurações do app › Básico</i>.</li>
+            <li>Copie o <b>ID do app</b> (só números) e cole no campo 1 ao lado.</li>
+            <li>Em <b>Chave secreta do app</b>, clique em <i>Mostrar</i> (pede sua senha do Facebook), copie e cole no campo 2.</li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary><b>Gere o token de acesso</b></summary>
+          <ul>
+            <li>Abra o <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener">Graph API Explorer</a>.</li>
+            <li>À direita, em <b>Meta App</b>, selecione o app que você criou.</li>
+            <li>Em <b>Permissions</b>, adicione uma por uma:
+              <div class="lista-permissoes"><code>instagram_basic</code><code>instagram_content_publish</code><code>pages_show_list</code><code>pages_read_engagement</code><code>business_management</code></div>
+              <small>Não aparece alguma? No painel do app vá em <i>Casos de uso › Personalizar › Permissões</i>, clique em <b>Adicionar</b> nela e volte aqui.</small></li>
+            <li>Clique em <b>Generate Access Token</b>. Na janela do Facebook, <b>marque a Página e o Instagram</b> que quer usar e confirme.</li>
+            <li>Copie o token (o texto longo que começa com <code>EAA</code>) e cole no campo 3.</li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details open>
+          <summary><b>Verifique e escolha a conta</b></summary>
+          <p class="nota-inline">Clique em <b>Verificar</b>. O sistema confere tudo, troca o token por um que não expira e mostra os Instagrams encontrados.</p>
+        </details>
+      </li>
+    </ol>
+
+    <form class="cartao form-coluna form-conectar" id="form-conectar" autocomplete="off">
+      <label>1. ID do app<input class="campo" name="app_id" inputmode="numeric" placeholder="ex: 1234567890123456" required></label>
+      <label>2. Chave secreta do app <small>(recomendado)</small><input class="campo" name="app_secret" type="password" placeholder="32 letras e números"></label>
+      <label>3. Token de acesso<textarea class="campo" name="token" rows="4" placeholder="EAA..." required></textarea></label>
+      <button class="botao" type="submit" id="btn-verificar">Verificar</button>
+      <p class="erro-login" id="erro-conectar" hidden></p>
+      <div id="resultado" hidden>
+        <p><b>Escolha a(s) conta(s) para conectar:</b></p>
+        <div id="lista-candidatas" class="lista-contas"></div>
+        <button class="botao" type="button" id="btn-salvar">Conectar</button>
+      </div>
+      <p class="nota-inline">🔒 A chave e o token são usados só para conectar. Guardamos apenas o acesso da Página, criptografado. Você pode revogar quando quiser no Facebook.</p>
+    </form>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+  let d = {}; try { d = await r.json(); } catch (_) {}
+  if (r.status === 401) location.href = "/entrar";
+  if (!r.ok) throw new Error(d.erro || "erro " + r.status);
+  return d;
+}
+$("#form-conectar").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target), btn = $("#btn-verificar"), erro = $("#erro-conectar");
+  erro.hidden = true; $("#resultado").hidden = true;
+  btn.disabled = true; btn.textContent = "Verificando com a Meta…";
+  try {
+    const d = await post("/api/conectar/verificar", Object.fromEntries(f));
+    $("#lista-candidatas").innerHTML = d.contas.map((c, i) => `
+      <label class="conta-linha selecionavel">
+        <input type="checkbox" value="${esc(c.ig_user_id)}" ${i === 0 && d.contas.length === 1 ? "checked" : ""}>
+        ${c.foto_url ? `<img src="${esc(c.foto_url)}" alt="" referrerpolicy="no-referrer">` : '<span class="avatar-vazio"></span>'}
+        <div><b>@${esc(c.username)}</b><small>Página: ${esc(c.page_nome)}${c.ja_conectada ? " · já conectada (vai atualizar)" : ""}</small>
+          ${c.nao_expira ? "" : '<small class="msg-erro">Esse acesso expira. Confira a Chave Secreta (passo 3).</small>'}</div>
+      </label>`).join("");
+    $("#resultado").hidden = false;
+    $("#resultado").scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch (err) {
+    erro.textContent = err.message; erro.hidden = false;
+  } finally {
+    btn.disabled = false; btn.textContent = "Verificar";
+  }
+});
+$("#btn-salvar").addEventListener("click", async () => {
+  const ids = [...document.querySelectorAll("#lista-candidatas input:checked")].map((i) => i.value);
+  const erro = $("#erro-conectar"); erro.hidden = true;
+  try { await post("/api/conectar/salvar", { ig_user_ids: ids }); location.href = "/painel"; }
+  catch (err) { erro.textContent = err.message; erro.hidden = false; }
+});
+document.querySelectorAll("[data-remover]").forEach((b) => b.addEventListener("click", async () => {
+  if (!b.dataset.armado) { b.dataset.armado = 1; b.textContent = "confirmar remoção?"; setTimeout(() => { delete b.dataset.armado; b.textContent = "remover"; }, 4000); return; }
+  try { await post(`/api/contas/${b.dataset.remover}/remover`); location.reload(); } catch (err) { b.textContent = err.message; }
+}));
+</script>
+{% endblock %}

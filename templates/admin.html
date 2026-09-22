@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block titulo %}Admin: {{ cfg.nome }}{% endblock %}
+{% block conteudo %}
+<main class="conteudo largo">
+  <h1 class="titulo-pagina">Clientes</h1>
+  <div class="resumo-admin">
+    <div><b>{{ resumo.total }}</b><span>cadastros</span></div>
+    <div><b>{{ resumo.ativos }}</b><span>ativos</span></div>
+    <div><b>{{ resumo.vencem_7d }}</b><span>vencem em 7 dias</span></div>
+    <div><b>{{ resumo.vencidos }}</b><span>vencidos</span></div>
+  </div>
+  <input class="campo busca-admin" id="busca" type="search" placeholder="buscar por nome, e-mail ou @">
+
+  <div class="lista-admin" id="lista-admin">
+    {% for u in usuarios %}
+    <article class="cliente sit-{{ u.situacao }}" data-id="{{ u.id }}" data-busca="{{ (u.nome ~ ' ' ~ u.email ~ ' ' ~ (u.arrobas or ''))|lower }}">
+      <div class="cliente-topo">
+        <div>
+          <b>{{ u.nome }}</b> <span class="pill pill-sit-{{ u.situacao }}">{{ u.situacao }}</span>
+          <small>{{ u.email }}{% if u.whatsapp %} · <a href="https://wa.me/{{ u.whatsapp|replace(' ','')|replace('-','')|replace('(','')|replace(')','') }}" target="_blank" rel="noopener">{{ u.whatsapp }}</a>{% endif %}</small>
+          <small>Desde {{ u.criado_em[8:10] }}/{{ u.criado_em[5:7] }}/{{ u.criado_em[:4] }}{% if u.ultimo_acesso %} · último acesso {{ u.ultimo_acesso[8:10] }}/{{ u.ultimo_acesso[5:7] }}{% endif %}</small>
+        </div>
+        <div class="cliente-validade">
+          {% if not u.admin %}<span>até</span><b>{{ u.ativo_ate[8:10] }}/{{ u.ativo_ate[5:7] }}/{{ u.ativo_ate[:4] }}</b>{% endif %}
+        </div>
+      </div>
+      <div class="cliente-nums">
+        <span>{{ u.n_contas }}/{{ u.max_contas }} conta(s) {{ u.arrobas or '' }}</span>
+        {% if u.n_desconectadas %}<span class="msg-erro">{{ u.n_desconectadas }} desconectada(s)</span>{% endif %}
+        <span>{{ u.n_agendados }} agendados</span>
+        <span>{{ u.n_pub30 }} publicados (30d)</span>
+        {% if u.n_erros %}<span class="msg-erro">{{ u.n_erros }} com erro</span>{% endif %}
+      </div>
+      {% if not u.admin %}
+      <div class="cliente-acoes">
+        <button class="botao-secundario" data-acao="estender" data-dias="30">+30 dias</button>
+        <button class="botao-secundario" data-acao="estender" data-dias="7">+7 dias</button>
+        <label class="inline">até <input class="campo campo-mini" type="date" data-campo="data"></label>
+        <button class="botao-secundario" data-acao="data">definir</button>
+        <label class="inline">contas <input class="campo campo-mini" type="number" min="1" max="50" value="{{ u.max_contas }}" data-campo="n"></label>
+        <button class="botao-secundario" data-acao="max_contas">salvar</button>
+        <button class="botao-secundario" data-acao="resetar_senha">nova senha</button>
+        <button class="botao-secundario perigo" data-acao="{{ 'desbloquear' if u.bloqueado else 'bloquear' }}">{{ 'desbloquear' if u.bloqueado else 'bloquear' }}</button>
+      </div>
+      <div class="cliente-obs">
+        <input class="campo" data-campo="texto" placeholder="anotação interna (ex: pagou Pix 22/09, plano agência)" value="{{ u.observacao or '' }}">
+        <button class="botao-secundario" data-acao="observacao">salvar nota</button>
+      </div>
+      {% endif %}
+      <p class="cliente-msg" hidden></p>
+    </article>
+    {% else %}
+    <p class="vazio">Nenhum cliente ainda.</p>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById("busca").addEventListener("input", (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll(".cliente").forEach((c) => (c.hidden = q && !c.dataset.busca.includes(q)));
+});
+document.getElementById("lista-admin").addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-acao]"); if (!b) return;
+  const card = b.closest(".cliente"), msg = card.querySelector(".cliente-msg");
+  const acao = b.dataset.acao;
+  if (["bloquear", "resetar_senha"].includes(acao) && !b.dataset.armado) {
+    const orig = b.textContent; b.dataset.armado = 1; b.textContent = "confirmar?";
+    setTimeout(() => { delete b.dataset.armado; b.textContent = orig; }, 4000); return;
+  }
+  const body = { acao, dias: b.dataset.dias };
+  card.querySelectorAll("[data-campo]").forEach((i) => (body[i.dataset.campo] = i.value));
+  if (acao === "data" && !body.data) { msg.textContent = "Escolha a data."; msg.hidden = false; return; }
+  const r = await fetch(`/admin/usuario/${card.dataset.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  msg.textContent = d.msg || d.erro || "erro"; msg.hidden = false;
+  if (r.ok && acao !== "resetar_senha" && acao !== "observacao") setTimeout(() => location.reload(), 900);
+});
+</script>
+{% endblock %}

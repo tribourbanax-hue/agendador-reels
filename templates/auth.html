@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}{{ "Criar conta" if modo == "cadastro" else "Entrar" }}: {{ cfg.nome }}{% endblock %}
+{% block topo %}{% endblock %}
+{% block rodape %}{% endblock %}
+{% block conteudo %}
+<main class="tela-login">
+  <form class="cartao-login" method="post" autocomplete="on">
+    <a href="/" class="marca-ponto grande" aria-label="voltar ao site"></a>
+    {% if modo == "cadastro" %}
+      <h1>Teste grátis por {{ cfg.teste_dias }} dias</h1>
+      <p class="sub">Sem cartão. Leva 1 minuto.</p>
+      <input class="campo" name="nome" placeholder="Seu nome" value="{{ form.nome or '' }}" required autofocus>
+      <input class="campo" name="email" type="email" placeholder="E-mail" value="{{ form.email or '' }}" required autocomplete="email">
+      <input class="campo" name="whatsapp" type="tel" placeholder="WhatsApp com DDD (para suporte)" value="{{ form.whatsapp or '' }}" autocomplete="tel">
+      <input class="campo" name="senha" type="password" placeholder="Crie uma senha (mín. 8)" minlength="8" required autocomplete="new-password">
+      <label class="check aceite"><input type="checkbox" name="aceite" value="1" required> Li e aceito os <a href="{{ url_for('termos') }}" target="_blank">termos de uso</a> e a <a href="{{ url_for('privacidade') }}" target="_blank">política de privacidade</a></label>
+      {% if erro %}<p class="erro-login">{{ erro }}</p>{% endif %}
+      <button class="botao" type="submit">Criar conta</button>
+      <p class="sub">Já tem conta? <a href="{{ url_for('entrar') }}">Entrar</a></p>
+    {% else %}
+      <h1>Entrar</h1>
+      <p class="sub">{{ cfg.nome }}</p>
+      <input class="campo" name="email" type="email" placeholder="E-mail" value="{{ form.email or '' }}" required autofocus autocomplete="email">
+      <input class="campo" name="senha" type="password" placeholder="Senha" required autocomplete="current-password">
+      {% if erro %}<p class="erro-login">{{ erro }}</p>{% endif %}
+      <button class="botao" type="submit">Entrar</button>
+      <p class="sub">Não tem conta? <a href="{{ url_for('cadastro') }}">Teste grátis</a></p>
+      <p class="sub">Esqueceu a senha?
+        {% if cfg.suporte_whatsapp %}<a href="https://wa.me/{{ cfg.suporte_whatsapp }}?text={{ ('Esqueci minha senha do ' ~ cfg.nome)|urlencode }}" target="_blank" rel="noopener">Chame o suporte</a>{% else %}Fale com o suporte{% endif %}</p>
+    {% endif %}
+  </form>
+</main>
+{% endblock %}
